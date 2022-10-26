@@ -21,7 +21,7 @@ except:
 
 # Import in the code with the actual implementation
 from GeneSequencing import *
-#from GeneSequencing_complete import *
+#from GeneSequencingComplete import *
 
 
 class Proj4GUI( QMainWindow ):
