@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from numpy import savez_compressed
 from which_pyqt import PYQT_VER
 if PYQT_VER == 'PYQT5':
 	from PyQt5.QtCore import QLineF, QPointF
@@ -23,6 +24,9 @@ INDEL = 5
 SUB = 1
 
 class GeneSequencing:
+	score = 0
+	alignment1 = ''
+	alignment2 = ''
 
 	def __init__( self ):
 		pass
@@ -34,16 +38,20 @@ class GeneSequencing:
 	def align( self, seq1, seq2, banded, align_length):
 		self.banded = banded
 		self.MaxCharactersToAlign = align_length
-
-###################################################################################################
-# your code should replace these three statements and populate the three variables: score, alignment1 and alignment2
-		score = random.random()*100;
-		alignment1 = 'abc-easy  DEBUG:({} chars,align_len={}{})'.format(
-			len(seq1), align_length, ',BANDED' if banded else '')
-		alignment2 = 'as-123--  DEBUG:({} chars,align_len={}{})'.format(
-			len(seq2), align_length, ',BANDED' if banded else '')
-###################################################################################################					
-		
 		return {'align_cost':score, 'seqi_first100':alignment1, 'seqj_first100':alignment2}
 
+	def unrestricted(self, seq1, seq2, align_length):
+		# create dp table
+		dp = []
+		# iterate row by row and fill in table by getting min of 3 options, up, left, and diagonal
+		# add a tuple into the table index with the value and the direction it came from
 
+		# then add row to table
+
+		# the last index of dp is the answer (score)
+		# then trace back to get the alignment (alignment1 and alignment2)
+
+
+
+	def banded(self, seq1, seq2, align_length):
+		return
