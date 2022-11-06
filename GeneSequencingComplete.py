@@ -37,8 +37,6 @@ class GeneSequencing:
 # how many base pairs to use in computing the alignment
 
 	def align( self, seq1, seq2, banded, align_length):
-		# self.banded = banded
-		# self.MaxCharactersToAlign = align_length
 		if banded:
 			score, alignment1, alignment2 = self.banded(seq1, seq2, align_length)
 			return {'align_cost': score, 'seqi_first100': alignment1, 'seqj_first100': alignment2}
@@ -46,6 +44,7 @@ class GeneSequencing:
 			score, alignment1, alignment2 = self.unrestricted(seq1, seq2, align_length)
 			return {'align_cost': score, 'seqi_first100': alignment1, 'seqj_first100': alignment2}
 
+	# O(nm) time and space
 	def unrestricted(self, seq1, seq2, align_length):
 		# get dimensions of table
 		row_end = min(len(seq1) + 1, align_length + 1)
@@ -54,9 +53,11 @@ class GeneSequencing:
 		# create dp table
 		dp = []
 
-		# iterate row by row and fill in table by getting min of 3 options, up, left, and diagonal
+		# iterate row by row and fill in table by getting min of 3 options, up, left, and diagonal O(mn)
+		# O(n)
 		for i in range(row_end):
 			row = []
+			# O(m)
 			for j in range(col_end):
 				if i == 0:
 					row.append((j * INDEL, LEFT))
@@ -70,6 +71,7 @@ class GeneSequencing:
 					row.append(min(left, up, diag, key=lambda x: x[0]))
 			dp.append(row)
 
+		# start at end of dp table and backtrack
 		score = dp[-1][-1][0]
 		alignment1 = []
 		alignment2 = []
@@ -77,6 +79,7 @@ class GeneSequencing:
 		# backtrack to get alignment
 		i = row_end - 1
 		j = col_end - 1
+		# worst case we visit every cell in the table O(mn)
 		while i > 0 and j > 0:
 			if dp[i][j][1] == UP:
 				alignment1.append(seq1[i-1])
@@ -92,14 +95,14 @@ class GeneSequencing:
 				i -= 1
 				j -= 1
 		
+		# O(n)
 		return score, "".join(alignment1[::-1]), "".join(alignment2[::-1])
 
 
-
+	# O(kn) time and space
 	def banded(self, seq1, seq2, align_length):
 		if abs(len(seq1) - len(seq2)) >= 500:
 			return math.inf, "No Alignment Possible", "No Alignment Possible"
-		banded_size = (2 * MAXINDELS) + 1
 		band_end = min(len(seq1) + 1, align_length + 1)
 
 		if len(seq1) > align_length:
@@ -109,11 +112,11 @@ class GeneSequencing:
 			seq2 = seq2[:align_length]
 
 		dp = []
-
+		# O(n)
 		for i in range(band_end):
 			row = [(math.inf, "")] * band_end
 			start_col = i - MAXINDELS
-			# end_col = min(len(seq2) + 1, align_length + 1, i + MAXINDELS + 1)
+			# O(k)
 			for j in range(start_col, i + MAXINDELS + 1):
 				if j < 0 or j > len(seq2) or j >= band_end:
 					continue
@@ -139,12 +142,12 @@ class GeneSequencing:
 					row[j] = (min(left, up, diag, key=lambda x: x[0]))
 			dp.append(row)
 
-
+		# start at end of dp table and backtrack
 		score = dp[-1][-1][0]
 		alignment1 = []
 		alignment2 = []
 
-		# backtrack to get alignment
+		# backtrack to get alignment, worst case we visit every cell in band O(kn)
 		i = len(dp) - 1
 		j = len(dp[-1]) - 1
 		while i > 0 and j > 0:
@@ -162,4 +165,5 @@ class GeneSequencing:
 				i -= 1
 				j -= 1
 		
+		# O(n)
 		return score, "".join(alignment1[::-1]), "".join(alignment2[::-1])
